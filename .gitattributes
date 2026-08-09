@@ -1,2 +1,13 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+venv/
+__pycache__/
+*.pyc
+
+data/*.csv
+
+models/*.pkl
+models/*.joblib
+
+uploads/*
+
+.ipynb_checkpoints/
+.env

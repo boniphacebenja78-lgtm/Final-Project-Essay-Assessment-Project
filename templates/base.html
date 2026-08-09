@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}EssayAI{% endblock %}
+    </title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    {% block head %}
+    {% endblock %}
+
+</head>
+
+
+<body>
+
+    <!-- NAVIGATION -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a href="/" class="logo">
+
+                <span class="logo-icon">✦</span>
+
+                <span>EssayAI</span>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="/">
+                    Dashboard
+                </a>
+
+                <a href="#about">
+                    About
+                </a>
+
+                <a href="#how-it-works">
+                    How it works
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main>
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer class="footer">
+
+        <div>
+
+            <strong>EssayAI</strong>
+
+            <span>
+                • Intro to AI Final Project
+            </span>
+
+        </div>
+
+        <p>
+            AI-powered essay assessment system
+        </p>
+
+    </footer>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script
+        src="{{ url_for('static', filename='js/app.js') }}"
+    ></script>
+
+    {% block scripts %}
+    {% endblock %}
+
+</body>
+
+</html>

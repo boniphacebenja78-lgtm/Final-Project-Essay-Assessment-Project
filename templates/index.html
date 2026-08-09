@@ -1,0 +1,938 @@
+```html
+{% extends "base.html" %}
+
+{% block title %}
+EssayAI — AI Essay Assessment
+{% endblock %}
+
+{% block content %}
+
+
+<!-- =========================================================
+     HERO SECTION
+     ========================================================= -->
+
+<section class="hero">
+
+    <div class="hero-badge">
+
+        <span>✦</span>
+
+        AI-POWERED ESSAY ASSESSMENT
+
+    </div>
+
+
+    <h1>
+
+        Smarter essay assessment.
+
+        <span>
+            Powered by AI.
+        </span>
+
+    </h1>
+
+
+    <p class="hero-description">
+
+        Analyze student essays using machine learning
+        and receive an intelligent assessment in seconds.
+
+    </p>
+
+</section>
+
+
+<!-- =========================================================
+     ASSESSMENT CARD
+     ========================================================= -->
+
+<section class="assessment-card">
+
+
+    <!-- CARD HEADER -->
+
+    <div class="card-header">
+
+        <div>
+
+            <h2>
+                Assess an Essay
+            </h2>
+
+            <p>
+                Paste an essay below to begin the AI assessment.
+            </p>
+
+        </div>
+
+
+        <div class="status">
+
+            <span class="status-dot"></span>
+
+            AI Model Ready
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ESSAY FORM
+         ===================================================== -->
+
+    <form
+        action="/assess"
+        method="POST"
+        id="essay-form"
+        enctype="multipart/form-data"
+    >
+
+
+        <!-- =================================================
+             UPLOAD / CAMERA OPTIONS
+             ================================================= -->
+
+        <div class="essay-input-options">
+
+
+            <!-- UPLOAD FROM COMPUTER -->
+
+            <label
+                for="essay-file"
+                class="input-option"
+            >
+
+                <div class="input-option-icon">
+                    📄
+                </div>
+
+
+                <div class="input-option-content">
+
+                    <strong>
+                        Upload Essay
+                    </strong>
+
+                    <span>
+                        PDF, DOCX, TXT or image
+                    </span>
+
+                </div>
+
+
+                <span class="input-option-arrow">
+                    →
+                </span>
+
+            </label>
+
+
+            <input
+                type="file"
+                id="essay-file"
+                name="essay_file"
+                accept=".pdf,.docx,.txt,.png,.jpg,.jpeg"
+                hidden
+            >
+
+
+            <!-- TAKE PICTURE -->
+
+            <button
+                type="button"
+                class="input-option"
+                id="camera-button"
+            >
+
+                <div class="input-option-icon">
+                    📷
+                </div>
+
+
+                <div class="input-option-content">
+
+                    <strong>
+                        Take a Picture
+                    </strong>
+
+                    <span>
+                        Capture an essay with your camera
+                    </span>
+
+                </div>
+
+
+                <span class="input-option-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+        </div>
+
+
+        <!-- =================================================
+             SELECTED FILE
+             ================================================= -->
+
+        <div
+            id="selected-file"
+            class="selected-file"
+            style="display: none;"
+        >
+
+            <span>
+                📎
+            </span>
+
+
+            <span id="selected-file-name"></span>
+
+
+            <button
+                type="button"
+                id="remove-file"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             CAMERA AREA
+             ================================================= -->
+
+        <div
+            id="camera-container"
+            class="camera-container"
+            style="display: none;"
+        >
+
+            <div class="camera-header">
+
+                <strong>
+                    Capture Essay
+                </strong>
+
+
+                <button
+                    type="button"
+                    id="close-camera"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <video
+                id="camera-video"
+                autoplay
+                playsinline
+            ></video>
+
+
+            <canvas
+                id="camera-canvas"
+                style="display: none;"
+            ></canvas>
+
+
+            <div class="camera-controls">
+
+                <button
+                    type="button"
+                    id="capture-button"
+                    class="capture-button"
+                >
+
+                    📷 Capture
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CAMERA CAPTURE FILE
+             ================================================= -->
+
+        <input
+            type="file"
+            id="camera-file"
+            name="camera_file"
+            accept="image/*"
+            hidden
+        >
+
+
+        <!-- =================================================
+             PASTE ESSAY DIVIDER
+             ================================================= -->
+
+        <div class="paste-divider">
+
+            <span>
+                OR PASTE ESSAY
+            </span>
+
+        </div>
+
+
+        <!-- =================================================
+             ESSAY EDITOR
+             ================================================= -->
+
+        <div class="editor-wrapper">
+
+            <div class="editor-toolbar">
+
+                <span>
+                    Student Essay
+                </span>
+
+
+                <span id="word-counter">
+                    0 words
+                </span>
+
+            </div>
+
+
+            <textarea
+                id="essay"
+                name="essay"
+                placeholder="Paste or type the student's essay here..."
+            ></textarea>
+
+        </div>
+
+
+        <!-- =================================================
+             ERROR MESSAGE
+             ================================================= -->
+
+        {% if error %}
+
+        <div class="error-message">
+
+            <span>
+                ⚠
+            </span>
+
+            {{ error }}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             ANALYZE BUTTON
+             ================================================= -->
+
+        <button
+            type="submit"
+            class="analyze-button"
+            id="analyze-button"
+        >
+
+            <span class="button-icon">
+                ✦
+            </span>
+
+
+            <span id="button-text">
+                Analyze Essay
+            </span>
+
+
+            <span class="button-arrow">
+                →
+            </span>
+
+        </button>
+
+
+    </form>
+
+</section>
+
+
+<!-- =========================================================
+     STATISTICS
+     ========================================================= -->
+
+<section class="stats-section">
+
+
+    <!-- STAT 1 -->
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            ◈
+        </div>
+
+
+        <div>
+
+            <strong>
+                24,728
+            </strong>
+
+
+            <span>
+                Training Essays
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- STAT 2 -->
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            ◎
+        </div>
+
+
+        <div>
+
+            <strong>
+                1 – 6
+            </strong>
+
+
+            <span>
+                Score Range
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- STAT 3 -->
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            ✦
+        </div>
+
+
+        <div>
+
+            <strong>
+                AI
+            </strong>
+
+
+            <span>
+                Machine Learning
+            </span>
+
+        </div>
+
+    </div>
+
+
+</section>
+
+
+<!-- =========================================================
+     HOW IT WORKS
+     ========================================================= -->
+
+<section class="how-section">
+
+
+    <div class="section-heading">
+
+        <span>
+            HOW IT WORKS
+        </span>
+
+
+        <h2>
+            From essay to assessment
+        </h2>
+
+    </div>
+
+
+    <div class="steps">
+
+
+        <!-- STEP 1 -->
+
+        <div class="step">
+
+            <div class="step-number">
+                01
+            </div>
+
+
+            <h3>
+                Submit
+            </h3>
+
+
+            <p>
+                Enter or upload a student's essay.
+            </p>
+
+        </div>
+
+
+        <!-- STEP 2 -->
+
+        <div class="step">
+
+            <div class="step-number">
+                02
+            </div>
+
+
+            <h3>
+                Analyze
+            </h3>
+
+
+            <p>
+
+                The AI processes the essay using
+                trained machine-learning models.
+
+            </p>
+
+        </div>
+
+
+        <!-- STEP 3 -->
+
+        <div class="step">
+
+            <div class="step-number">
+                03
+            </div>
+
+
+            <h3>
+                Assess
+            </h3>
+
+
+            <p>
+
+                Receive a predicted score and
+                detailed feedback.
+
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ABOUT SECTION
+     ========================================================= -->
+
+<section class="about-section">
+
+
+    <div class="about-content">
+
+
+        <div class="about-label">
+
+            ABOUT THE PROJECT
+
+        </div>
+
+
+        <h2>
+
+            Bringing AI into
+
+            <span>
+                essay assessment.
+            </span>
+
+        </h2>
+
+
+        <p>
+
+            EssayAI is an Intro to Artificial Intelligence
+            project that uses machine learning to analyze
+            student essays and predict assessment scores.
+
+        </p>
+
+
+        <p>
+
+            The system is trained using the ASAP2 essay
+            dataset and combines natural language processing,
+            feature engineering, machine learning Model, Predicted Score and Feedback Generator.
+
+        </p>
+
+
+    </div>
+
+
+</section>
+
+
+<!-- =========================================================
+     PAGE JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+
+/* =========================================================
+   FILE UPLOAD
+   ========================================================= */
+
+const fileInput =
+    document.getElementById("essay-file");
+
+const selectedFile =
+    document.getElementById("selected-file");
+
+const selectedFileName =
+    document.getElementById("selected-file-name");
+
+const removeFileButton =
+    document.getElementById("remove-file");
+
+
+fileInput.addEventListener(
+    "change",
+    function () {
+
+        if (this.files.length > 0) {
+
+            const file = this.files[0];
+
+            selectedFileName.textContent =
+                file.name;
+
+            selectedFile.style.display =
+                "flex";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   REMOVE FILE
+   ========================================================= */
+
+removeFileButton.addEventListener(
+    "click",
+    function () {
+
+        fileInput.value = "";
+
+        selectedFile.style.display =
+            "none";
+
+    }
+);
+
+
+/* =========================================================
+   CAMERA VARIABLES
+   ========================================================= */
+
+const cameraButton =
+    document.getElementById("camera-button");
+
+const cameraContainer =
+    document.getElementById("camera-container");
+
+const cameraVideo =
+    document.getElementById("camera-video");
+
+const cameraCanvas =
+    document.getElementById("camera-canvas");
+
+const captureButton =
+    document.getElementById("capture-button");
+
+const closeCameraButton =
+    document.getElementById("close-camera");
+
+const cameraFile =
+    document.getElementById("camera-file");
+
+
+let cameraStream = null;
+
+
+/* =========================================================
+   OPEN CAMERA
+   ========================================================= */
+
+cameraButton.addEventListener(
+    "click",
+    async function () {
+
+        try {
+
+            cameraStream =
+                await navigator.mediaDevices.getUserMedia({
+
+                    video: {
+                        facingMode: "environment"
+                    },
+
+                    audio: false
+
+                });
+
+
+            cameraVideo.srcObject =
+                cameraStream;
+
+            cameraContainer.style.display =
+                "block";
+
+        }
+
+        catch (error) {
+
+            alert(
+                "Unable to access the camera. Please allow camera permission in your browser."
+            );
+
+            console.error(error);
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   CAPTURE IMAGE
+   ========================================================= */
+
+captureButton.addEventListener(
+    "click",
+    function () {
+
+        const width =
+            cameraVideo.videoWidth;
+
+        const height =
+            cameraVideo.videoHeight;
+
+
+        cameraCanvas.width =
+            width;
+
+        cameraCanvas.height =
+            height;
+
+
+        const context =
+            cameraCanvas.getContext("2d");
+
+
+        context.drawImage(
+            cameraVideo,
+            0,
+            0,
+            width,
+            height
+        );
+
+
+        cameraCanvas.toBlob(
+            function (blob) {
+
+                const file =
+                    new File(
+                        [blob],
+                        "captured_essay.jpg",
+                        {
+                            type: "image/jpeg"
+                        }
+                    );
+
+
+                const dataTransfer =
+                    new DataTransfer();
+
+
+                dataTransfer.items.add(file);
+
+
+                cameraFile.files =
+                    dataTransfer.files;
+
+
+                selectedFileName.textContent =
+                    "captured_essay.jpg";
+
+
+                selectedFile.style.display =
+                    "flex";
+
+
+                closeCamera();
+
+            },
+            "image/jpeg",
+            0.95
+        );
+
+    }
+);
+
+
+/* =========================================================
+   CLOSE CAMERA
+   ========================================================= */
+
+closeCameraButton.addEventListener(
+    "click",
+    closeCamera
+);
+
+
+function closeCamera() {
+
+    if (cameraStream) {
+
+        cameraStream
+            .getTracks()
+            .forEach(
+                track => track.stop()
+            );
+
+        cameraStream = null;
+
+    }
+
+
+    cameraVideo.srcObject =
+        null;
+
+    cameraContainer.style.display =
+        "none";
+
+}
+
+
+/* =========================================================
+   WORD COUNTER
+   ========================================================= */
+
+const essayTextarea =
+    document.getElementById("essay");
+
+const wordCounter =
+    document.getElementById("word-counter");
+
+
+essayTextarea.addEventListener(
+    "input",
+    function () {
+
+        const text =
+            this.value.trim();
+
+
+        if (!text) {
+
+            wordCounter.textContent =
+                "0 words";
+
+            return;
+
+        }
+
+
+        const words =
+            text.split(/\s+/).length;
+
+
+        wordCounter.textContent =
+            words + (
+                words === 1
+                    ? " word"
+                    : " words"
+            );
+
+    }
+);
+
+
+/* =========================================================
+   FORM SUBMISSION
+   ========================================================= */
+
+const essayForm =
+    document.getElementById("essay-form");
+
+const analyzeButton =
+    document.getElementById("analyze-button");
+
+const buttonText =
+    document.getElementById("button-text");
+
+
+essayForm.addEventListener(
+    "submit",
+    function () {
+
+        if (
+            !essayTextarea.value.trim() &&
+            !fileInput.files.length &&
+            !cameraFile.files.length
+        ) {
+
+            return;
+
+        }
+
+
+        buttonText.textContent =
+            "Analyzing...";
+
+
+        analyzeButton.disabled =
+            true;
+
+    }
+);
+
+
+</script>
+
+
+{% endblock %}
+```

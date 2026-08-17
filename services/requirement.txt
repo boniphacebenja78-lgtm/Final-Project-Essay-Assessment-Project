@@ -1,0 +1,2 @@
+pip install -r requirements.txt
+kagglehub.dataset_download("lburleigh/asap-2-0")

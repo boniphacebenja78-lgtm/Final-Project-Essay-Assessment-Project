@@ -1,16 +1,8 @@
-from flask import (
-    Flask,
-    render_template,
-    request
-)
-
+from flask import Flask, render_template, request
 import os
-import tempfile
 
 from pypdf import PdfReader
 from docx import Document
-from PIL import Image
-import pytesseract
 
 from services.prediction_service import predict_score
 from services.feedback_service import generate_feedback
@@ -118,24 +110,11 @@ def extract_docx(file):
 
 
 # =========================================================
-# Extract text from image
-# =========================================================
-
-def extract_image(file):
-
-    image = Image.open(
-        file
-    )
-
-    text = pytesseract.image_to_string(
-        image
-    )
-
-    return text
-
-
-# =========================================================
 # Extract essay text from uploaded file
+# Supports:
+# TXT
+# PDF
+# DOCX
 # =========================================================
 
 def extract_essay_from_file(file):
@@ -193,24 +172,9 @@ def extract_essay_from_file(file):
         )
 
 
-    # -----------------------------------------------------
-    # IMAGE
-    # -----------------------------------------------------
-
-    if extension in [
-        ".png",
-        ".jpg",
-        ".jpeg"
-    ]:
-
-        return extract_image(
-            file
-        )
-
-
     raise ValueError(
         "Unsupported file type. "
-        "Please upload a PDF, DOCX, TXT, JPG, JPEG, or PNG file."
+        "Please upload a PDF, DOCX, or TXT file."
     )
 
 
@@ -224,30 +188,29 @@ def extract_essay_from_file(file):
 )
 def assess():
 
+    # -----------------------------------------------------
+    # Get pasted essay
+    # -----------------------------------------------------
+
     essay = request.form.get(
         "essay",
         ""
     ).strip()
 
 
-    # =====================================================
-    # STEP 1 — CHECK NORMAL PASTED ESSAY
-    # =====================================================
+    # -----------------------------------------------------
+    # Get uploaded file
+    # -----------------------------------------------------
 
     uploaded_file = request.files.get(
         "essay_file"
     )
 
 
-    camera_file = request.files.get(
-        "camera_file"
-    )
-
-
     try:
 
         # =================================================
-        # STEP 2 — HANDLE COMPUTER UPLOAD
+        # HANDLE COMPUTER UPLOAD
         # =================================================
 
         if uploaded_file and uploaded_file.filename:
@@ -264,40 +227,23 @@ def assess():
 
 
         # =================================================
-        # STEP 3 — HANDLE CAMERA IMAGE
-        # =================================================
-
-        elif camera_file and camera_file.filename:
-
-            camera_text = (
-                extract_essay_from_file(
-                    camera_file
-                )
-            )
-
-            if camera_text:
-
-                essay = camera_text.strip()
-
-
-        # =================================================
-        # STEP 4 — VALIDATE ESSAY
+        # VALIDATE ESSAY
         # =================================================
 
         if not essay:
 
             return render_template(
                 "index.html",
+
                 error=(
-                    "Please paste an essay, "
-                    "upload an essay, or take a picture "
-                    "of an essay."
+                    "Please paste an essay "
+                    "or upload a PDF, DOCX, or TXT file."
                 )
             )
 
 
         # =================================================
-        # STEP 5 — PREDICT SCORE
+        # PREDICT SCORE
         # =================================================
 
         score = predict_score(
@@ -306,7 +252,7 @@ def assess():
 
 
         # =================================================
-        # STEP 6 — GENERATE FEEDBACK
+        # GENERATE FEEDBACK
         # =================================================
 
         feedback = generate_feedback(
@@ -316,7 +262,7 @@ def assess():
 
 
         # =================================================
-        # STEP 7 — DISPLAY RESULT
+        # DISPLAY RESULT
         # =================================================
 
         return render_template(
@@ -346,5 +292,5 @@ def assess():
 if __name__ == "__main__":
 
     app.run(
-        debug=True
+        debug=False
     )

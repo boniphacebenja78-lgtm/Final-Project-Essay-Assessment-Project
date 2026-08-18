@@ -9,7 +9,16 @@ from services.essay_analyzer import analyze_essay
 # MODEL CONFIGURATION
 # =========================================================
 
-MODEL_DIR = "models"
+BASE_DIR = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
+
+MODEL_DIR = os.path.join(
+    BASE_DIR,
+    "models"
+)
 
 GRADIENT_BOOSTING_MODEL = os.path.join(
     MODEL_DIR,
